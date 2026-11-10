@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AFTAB MUSIC - FALLBACK</title>
+<style>body{background:#000;color:#fff;font-family:Arial;padding:16px}input{width:100%;padding:14px;border-radius:100px;border:1px solid #444;background:#111;color:#fff;margin:10px 0}.btn{padding:13px 20px;border-radius:100px;border:none;font-weight:800;width:100%;margin:5px 0;cursor:pointer}.red{background:#FF0000;color:#fff}.green{background:#1DB954;color:#fff}.blue{background:#00A8FF;color:#fff}.box{background:#111;border:1px solid #333;border-radius:16px;padding:14px;margin:12px 0}.song{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:10px;margin:8px 0}.song a{color:#00A8FF;text-decoration:none;font-weight:800}</style>
+</head>
+<body>
+<h1 style="text-align:center">AFTAB MUSIC <span style="color:#00A8FF">BLUE</span></h1>
+<p style="text-align:center;font-size:12px;opacity:.6">If PLAY INSIDE fails, use OPEN IN APP - Always Works</p>
+
+<div class="box">
+<h3>▶ YOUTUBE</h3>
+<input id="yt" placeholder="Paste YouTube link...">
+<button class="btn red" onclick="addYT()">ADD YOUTUBE SONG</button>
+<button class="btn" style="background:#333;color:#fff" onclick="addDemoYT()">🧪 TEST: Add Faded</button>
+</div>
+
+<div class="box">
+<h3>♫ SPOTIFY</h3>
+<input id="sp" placeholder="Paste Spotify link...">
+<button class="btn green" onclick="addSP()">ADD SPOTIFY SONG</button>
+<button class="btn" style="background:#333;color:#fff" onclick="addDemoSP()">🧪 TEST: Add Spotify Demo</button>
+</div>
+
+<div id="list"></div>
+<div id="player" style="display:none;background:#111;border:2px solid #00A8FF;border-radius:16px;padding:12px;margin-top:12px">
+<b id="now"></b><div id="area" style="margin-top:10px"></div>
+<button class="btn" style="background:#333;color:#fff" onclick="document.getElementById('player').style.display='none';document.getElementById('area').innerHTML=''">CLOSE</button>
+</div>
+
+<script>
+let songs=[];
+function getYT(u){
+  u=u.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(u)) return u;
+  let m=u.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || u.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/) || u.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+function addYT(){
+  let url=document.getElementById('yt').value;
+  let id=getYT(url);
+  if(!id){alert('WRONG LINK!\n\nYou pasted:\n'+url+'\n\nCorrect way: Open YouTube App > Share > Copy Link\nIt should look like:\nhttps://youtu.be/60ItHLz5WEA');return;}
+  songs.unshift({type:'yt',id:id,title:'YouTube Song '+id,url:url});
+  document.getElementById('yt').value=''; render(); play(0);
+}
+function addDemoYT(){ songs.unshift({type:'yt',id:'60ItHLz5WEA',title:'Alan Walker - Faded',url:'https://youtu.be/60ItHLz5WEA'}); render(); play(0); }
+function addSP(){
+  let url=document.getElementById('sp').value;
+  let m=url.match(/spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+  if(!m){alert('WRONG SPOTIFY LINK!\n\nGo to Spotify > Share > Copy Link');return;}
+  songs.unshift({type:'sp',spType:m[1],id:m[2],title:'Spotify '+m[1],url:url});
+  document.getElementById('sp').value=''; render(); play(0);
+}
+function addDemoSP(){ songs.unshift({type:'sp',spType:'track',id:'4uLU6hMCjMI75M1A2tKUQC',title:'Ed Sheeran - Shape of You',url:'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC'}); render(); play(0); }
+function render(){
+  document.getElementById('list').innerHTML = songs.length? '<h3>Your Songs ('+songs.length+')</h3>' + songs.map((s,i)=>{
+    let openUrl = s.type==='yt' ? 'https://www.youtube.com/watch?v='+s.id : s.url;
+    return `<div class="song"><b>${s.title}</b><br><span style="font-size:11px;opacity:.6">${s.type} • ${s.id}</span><br><br>
+    <button class="btn blue" onclick="play(${i})">▶ PLAY INSIDE APP</button>
+    <a href="${openUrl}" target="_blank"><button class="btn" style="background:#fff;color:#000">↗ OPEN IN ${s.type==='yt'?'YOUTUBE APP':'SPOTIFY APP'} - ALWAYS WORKS</button></a></div>`
+  }).join('') : '<p style="text-align:center;opacity:.6">No songs yet - Tap TEST button</p>';
+}
+function play(i){
+  let s=songs[i];
+  document.getElementById('player').style.display='block';
+  document.getElementById('now').textContent='Now Playing: '+s.title;
+  if(s.type==='yt'){
+    document.getElementById('area').innerHTML=`<iframe width="100%" height="220" src="https://www.youtube.com/embed/${s.id}?autoplay=
